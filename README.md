@@ -17,9 +17,10 @@ that automatically caches functions passed through it.
 
 ## Basic Usage
 
+### Getting Started
+
 Because this is a wrapper around [redis](https://github.com/NodeRedis/node_redis), 
 you will need to construct a valid redis client and pass it to Tance.
-
 
 ```
 const redis = require('redis');
@@ -27,7 +28,14 @@ const Tance = require('./lib/tance').Tance;
 
 const redisClient = redis.createClient();
 const tance = new Tance(redisClient);
+```
 
+### Gets & Sets
+Every command against Tance is just a [redis command](https://redis.io/commands) 
+(i.e. "set"),
+but it returns a promise that resolves when the command completes.
+
+```
 async function doThings(){
     await tance.set("argle", "bargle");
     let margle = await tance.get("argle");
@@ -36,29 +44,21 @@ async function doThings(){
 };
 ```
 
-## Imaginary Documentation
+Commands that have many arguments just lay out those 
+arguments one at a time. 
 
-* sync objects using streams
-*  each object has a separate stream
-*  only makes sense for large objects 
-    like "all of my friends"
-* modify an object with an x => x function
-* create a little table (Tance.Table) 
-    with a schema and indexes
-* create a list sorted by date (Tance.LastTen)
-
-- a user has sessions
-- each session comes with a subscription to an object like
-    "all of my friends" and "notifications for me"
-- the status of that object is synced between the
-    server, the connected client, and the API client
-- a world has instances
-- each instance comes with a subscription to an object like
-    "all of the users in this instance" 
-    and "the memory of this instance" 
+```
+async function doThings(){
+    await tance.set("slappy", "pappy", "EX", 180);
+    let pappy = await tance.get("slappy");
+    
+    console.log("slappy? ", pappy); // slappy? pappy
+};
+```
 
 
-## Patching Redis-Tance
+
+## Working on Redis-Tance
 
 ### Running Redis
 
