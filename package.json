@@ -1,0 +1,25 @@
+{
+  "name": "redistance",
+  "version": "1.0.0",
+  "description": "a collection of useful redis utilities",
+  "main": "index.js",
+  "dependencies": {
+    "node-redis": "^0.1.7",
+    "redis-commands": "^1.4.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/classam/redis-tance.git"
+  },
+  "author": "Curtis Lassam",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/classam/redis-tance/issues"
+  },
+  "homepage": "https://github.com/classam/redis-tance#readme"
+}
