@@ -12,3 +12,12 @@ const help = () => {
 desc("List all tools & options.");
 task('default', help);
 task('help', help);
+
+/*
+ * Test all the things.
+ */
+const test = () => {
+    return run('mocha test');
+}
+desc("Test all the things");
+task('test', test);

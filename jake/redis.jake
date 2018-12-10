@@ -1,7 +1,7 @@
 const docker = require('./docker.jake');
 
 const REDIS_PORT = 6379;
-const redis_docker_name = "local-redis";
+const redis_docker_name = "test-redis";
 
 /*
  * Build and start Redis

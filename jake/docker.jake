@@ -95,7 +95,7 @@ async function kill({name}){
  */
 async function start ({name, container, environment, detached, ports}) {
     if(await isRunning({name: name})){
-        console.log(`${params.name} is already running!`)
+        console.log(`${name} is already running!`);
         return Promise.resolve();
     }
 
