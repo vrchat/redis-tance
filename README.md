@@ -56,7 +56,95 @@ async function doThings(){
 };
 ```
 
+### Cache
 
+Tance provides a cache wrapper that provides a sane-but-not-comprehensive
+ default cache behavior for asynchronous functions.
+ 
+It might struggle if given a function with very complex inputs. 
+
+```
+    async function _rng(){
+        return uuid();
+    }
+
+    const rng = tance.cache(_rng, 100);
+
+    let rng1 = await rng();
+    let rng2 = await rng();
+    
+    // rng2 should be the same as rng1, even though the 
+    // function would otherwise produce a random value every time
+
+    assert.equal(rng1, rng2);
+```
+
+#### Caching Functions With Arguments
+
+Tance will only cache functions if their arguments exactly match.
+
+```
+    async function _rng({x, y, z}){
+        return uuid();
+    }
+
+    let rng = tance.cache(_rng, 100);
+
+    let rng1 = await rng({x: 1, y: 1, z: 1});
+    let rng2 = await rng({x: 1, y: 2, z: 2});
+    let rng3 = await rng({x: 1, y: 1, z: 1});
+
+    // rng1 and rng3 should be the same, because they share arguments
+    assert.equal(rng1, rng3);
+    
+    // rng1 and rng2 should not be the same, because they don't
+    assert.notEqual(rng1, rng2);
+```
+
+#### Clearing the Cache
+
+`tance.clearCache` will clear the cache of any cached items 
+that exactly match the parameters they've been provided.
+
+```
+    async function _rng(){
+        return uuid();
+    }
+    let rng = tance.cache(_rng, 100);
+
+    let rng1 = await rng({x: 1, y: 1, z: 1});
+    let rng2 = await rng({x: 2, y: 2, z: 2});
+
+    await tance.clearCache({x: 1, y: 1, z: 1}, "_rng5");
+    let rng3 = await rng({x: 1, y: 1, z: 1});
+    let rng4 = await rng({x: 2, y: 2, z: 2});
+
+
+    assert.notEqual(rng1, rng3);
+    assert.equal(rng2, rng4);
+```
+
+This stuff won't work when caching functions 
+that don't take named parameters - the only way to clear
+the cache for these functions is to completely clear the cache.
+
+`tance.clearCache` with a null argument will completely clear
+the cache. 
+
+```
+    async function _rng(){
+        return uuid();
+    }
+
+    let rng = tance.cache(_rng, 100);
+
+    let rng1 = await rng();
+    await tance.clearCache(null, "_rng2");
+
+    let rng2 = await rng();
+
+    assert.notEqual(rng1, rng2);
+```
 
 ## Working on Redis-Tance
 
