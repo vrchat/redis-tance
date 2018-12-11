@@ -24,7 +24,7 @@ you will need to construct a valid redis client and pass it to Tance.
 
 ```
 const redis = require('redis');
-const Tance = require('./lib/tance').Tance;
+const Tance = require('redistance').Tance;
 
 const redisClient = redis.createClient();
 const tance = new Tance(redisClient);

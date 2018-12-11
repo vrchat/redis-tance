@@ -1,4 +1,3 @@
 'use strict';
 
-
-module.exports = Tance;
+module.exports = require('./lib/tance');
