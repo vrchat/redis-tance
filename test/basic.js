@@ -137,5 +137,28 @@ describe("Cache tests", function() {
         assert.isObject(rng2);
     });
 
+    it("We should be able to index our cache so that we can delete all of the things in a specific category in the cache", async function() {
+
+        async function _rng7({x, y, z}){
+            return uuid();
+        }
+
+        let rng = tance.cache(_rng7, 100);
+        tance.cacheIndex(['x'], '_rng7');
+
+        let rng1 = await rng({x: 1, y: 1, z: 1});
+        let rng2 = await rng({x: 1, y: 2, z: 3});
+        let rng3 = await rng({x: 2, y: 2, z: 3});
+        // this should clear everything with x=1
+        await tance.clearCache({'x': 1}, '_rng7');
+        let rng4 = await rng({x: 1, y: 1, z: 1});
+        let rng5 = await rng({x: 1, y: 2, z: 3});
+        let rng6 = await rng({x: 2, y: 2, z: 3});
+
+        assert.notEqual(rng1, rng4);
+        assert.notEqual(rng2, rng5);
+        assert.equal(rng3, rng6);
+
+    });
 
 });
