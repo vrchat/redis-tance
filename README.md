@@ -146,6 +146,75 @@ the cache.
     assert.notEqual(rng1, rng2);
 ```
 
+#### Caching Stuff With a Non-String Return Value
+
+Because everything that gets returned is pushed through Redis,
+it's hard to cache a function that returns a non-string value, 
+unless you first pass it through a serializer and deserializer.
+
+Here, we create tance.cache with JSON.stringify as the serializer
+and JSON.parse as the deserializer, which allows us to cache a 
+function that returns an object. 
+
+```
+async function _rng({x, y, z}){
+    return {
+        'gargle': 'margle',
+        'bargle': 'fargle',
+        'targle': 'chargle',
+        'rng': uuid(),
+    };
+}
+
+let rng = tance.cache(_rng, 100, '_rng', JSON.stringify, JSON.parse);
+
+let rng1 = await rng({x: 1, y: 1, z: 1});
+let rng2 = await rng({x: 1, y: 1, z: 1});
+
+assert.deepEqual(rng1, rng2);
+assert.isObject(rng1);
+assert.isObject(rng2);
+```
+
+#### Cache Indexing
+
+Normally, clearing the cache only works on sets of arguments that are
+an exact match - so, for example, if I wanted to clear 
+`{x: 1, y: 1, z:1}`, I'd have to call clearCache with exactly 
+`{x: 1, y: 1, z:1}`. 
+
+It's not, however, always possible to know exactly which cache entries
+we want to clear &mdash; but clearing the entire cache for the
+function wouldn't be granular enough.
+
+That's why we have cache indexing: a way to define a subset
+of arguments that we can clear all at once.
+
+```
+async function _rng({x, y, z}){
+    return uuid();
+}
+
+let rng = tance.cache(_rng, 100);
+tance.cacheIndex(['x'], '_rng');
+
+let rng1 = await rng({x: 1, y: 1, z: 1});
+let rng2 = await rng({x: 1, y: 2, z: 3});
+let rng3 = await rng({x: 2, y: 2, z: 3});
+// this should clear everything with x=1
+await tance.clearCache({'x': 1}, '_rng');
+// whereas this would ONLY clear {x: 1, y: 2, z: 3}
+await tance.clearCache({'x': 1, 'y': 2, 'z': 3}, '_rng');
+let rng4 = await rng({x: 1, y: 1, z: 1});
+let rng5 = await rng({x: 1, y: 2, z: 3});
+let rng6 = await rng({x: 2, y: 2, z: 3});
+
+assert.notEqual(rng1, rng4);
+assert.notEqual(rng2, rng5);
+assert.equal(rng3, rng6);
+```
+
+
 ## Working on Redis-Tance
 
 ### Running Redis

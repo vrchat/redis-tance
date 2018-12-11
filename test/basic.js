@@ -161,4 +161,28 @@ describe("Cache tests", function() {
 
     });
 
+    it("Index clears should only happen on an exact match with the doodly", async function() {
+
+        async function _rng8({x, y, z}){
+            return uuid();
+        }
+
+        let rng = tance.cache(_rng8, 100);
+        tance.cacheIndex(['x'], '_rng8');
+
+        let rng1 = await rng({x: 1, y: 1, z: 1});
+        let rng2 = await rng({x: 1, y: 2, z: 3});
+        let rng3 = await rng({x: 2, y: 2, z: 3});
+        // this should not clear everything with x=1
+        await tance.clearCache({'x': 1, 'y': 2, 'z': 3}, '_rng8');
+        let rng4 = await rng({x: 1, y: 1, z: 1});
+        let rng5 = await rng({x: 1, y: 2, z: 3});
+        let rng6 = await rng({x: 2, y: 2, z: 3});
+
+        assert.equal(rng1, rng4);
+        assert.notEqual(rng2, rng5);
+        assert.equal(rng3, rng6);
+
+    });
+
 });
