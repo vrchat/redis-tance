@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('./lib/tance');
+module.exports = require('./lib/Tance');

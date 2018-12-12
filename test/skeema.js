@@ -1,6 +1,6 @@
 const redis = require('redis');
-const Tance = require('../lib/tance').Tance;
-const Skeema = require('../lib/tance').Skeema;
+const Tance = require('../lib/Tance').Tance;
+const Skeema = require('../lib/Tance').Skeema;
 const assert = require('chai').assert;
 const uuid = require('uuid/v4');
 
@@ -21,15 +21,16 @@ describe("Schema tests", function() {
         let employeeV1 = {
             "type": "object",
             "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "version": {"type": "integer"},
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
             },
             "required": ["firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema();
-
-        employeeSchema.addVersion(employeeV1, x => x);
+        let employeeSchema = new Skeema({type: "Employee", v1: employeeV1});
 
         let validEmployee = {
             "version": 1,
@@ -44,15 +45,16 @@ describe("Schema tests", function() {
         let employeeV1 = {
             "type": "object",
             "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "version": {"type": "integer"},
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
             },
             "required": ["firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema();
-
-        employeeSchema.addVersion(employeeV1, x => x);
+        let employeeSchema = new Skeema({type: "Employee", v1: employeeV1});
 
         let invalidEmployee = {
             "version": 1,
@@ -66,6 +68,9 @@ describe("Schema tests", function() {
         let employeeV1 = {
             "type": "object",
             "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "version": {"type": "integer"},
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
             },
@@ -75,6 +80,9 @@ describe("Schema tests", function() {
         let employeeV2 = {
             "type": "object",
             "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "version": {"type": "integer"},
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
                 "salary": {"type": "integer"},
@@ -85,6 +93,9 @@ describe("Schema tests", function() {
         let employeeV3 = {
             "type": "object",
             "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "version": {"type": "integer"},
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
                 "salary": {"type": "integer"},
@@ -93,7 +104,7 @@ describe("Schema tests", function() {
             "required": ["firstname", "lastname", "fullname"]
         }
 
-        let employeeSchema = new Skeema();
+        let employeeSchema = new Skeema({type: "Employee"});
 
         employeeSchema.addVersion(employeeV1, x => x);
         employeeSchema.addVersion(employeeV2, v1_employee => {
@@ -112,6 +123,8 @@ describe("Schema tests", function() {
             "firstname": "Charles",
             "lastname": "Huckbreimer",
         };
+
+        assert.isTrue(employeeSchema.isValid(validEmployee));
 
         let upgradedEmployee = employeeSchema.upgrade(validEmployee);
 

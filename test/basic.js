@@ -1,5 +1,5 @@
 const redis = require('redis');
-const Tance = require('../lib/tance').Tance;
+const Tance = require('../lib/Tance').Tance;
 const assert = require('chai').assert;
 const uuid = require('uuid/v4');
 
