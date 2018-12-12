@@ -26,6 +26,7 @@ describe("Document tests", function() {
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
             },
+            "additionalProperties": false,
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
@@ -56,6 +57,7 @@ describe("Document tests", function() {
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
             },
+            "additionalProperties": false,
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
@@ -86,6 +88,7 @@ describe("Document tests", function() {
                 "firstname": {"type": "string"},
                 "lastname": {"type": "string"},
             },
+            "additionalProperties": false,
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
@@ -111,6 +114,7 @@ describe("Document tests", function() {
                 "lastname": {"type": "string"},
                 "fullname": {"type": "string"},
             },
+            "additionalProperties": false,
             "required": ["id", "type", "version", "firstname", "lastname", "fullname"]
         };
 
@@ -125,6 +129,76 @@ describe("Document tests", function() {
 
         // when we get the OLD document, it should, as if by magic, conform to the new schema
         assert.equal(getEmployee.fullname, "Dang Son");
+    });
+
+    it("Modify an employee", async function() {
+        let empl = {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "version": {"type": "integer"},
+                "firstname": {"type": "string"},
+                "lastname": {"type": "string"},
+            },
+            "additionalProperties": false,
+            "required": ["id", "type", "version", "firstname", "lastname"]
+        };
+
+        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+
+        let document = tance.document({schema: employeeSchema});
+
+        let employee = {
+            "firstname": "Ilene",
+            "lastname": "Dover",
+        };
+
+        let setEmployee = await document.set(employee);
+
+        await document.modify((dover)=>{
+            dover.firstname = "Ben";
+            return dover;
+        });
+
+        let getEmployee = await document.get();
+
+        assert.equal(setEmployee.firstname, "Ilene");
+        assert.equal(getEmployee.firstname, "Ben");
+        assert.equal(getEmployee.lastname, "Dover");
+    });
+
+    it("Delete an employee", async function() {
+        let empl = {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string"},
+                "version": {"type": "integer"},
+                "firstname": {"type": "string"},
+                "lastname": {"type": "string"},
+            },
+            "additionalProperties": false,
+            "required": ["id", "type", "version", "firstname", "lastname"]
+        };
+
+        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+
+        let document = tance.document({schema: employeeSchema});
+
+        let employee = {
+            "firstname": "Ilene",
+            "lastname": "Dover",
+        };
+
+        let setEmployee = await document.set(employee);
+
+        await document.delete();
+
+        let getEmployee = await document.get();
+
+        assert.equal(setEmployee.firstname, "Ilene");
+        assert.isNull(getEmployee);
     });
 
 });
