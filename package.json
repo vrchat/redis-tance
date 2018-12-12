@@ -4,6 +4,7 @@
   "description": "a collection of useful redis utilities",
   "main": "index.js",
   "dependencies": {
+    "jsonschema": "^1.2.4",
     "murmurhash": "0.0.2",
     "node-redis": "^0.1.7",
     "redis": "^2.8.0",
