@@ -49,6 +49,11 @@ describe("Widget tests", function() {
         return;
     });
 
+    beforeEach(async function () {
+        await tance.flushall();
+        return;
+    });
+
     it("Create and retrieve a widget", async function () {
         let table = new WidgetTable({tance});
         let widgeotto = await table.insert({
@@ -90,12 +95,19 @@ describe("Widget tests", function() {
             "created_at_timestamp": luxon.local().valueOf(),
             "created_at_iso": luxon.local().toString(),
         });
+        await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "someOtherWidget",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
 
         let results = await table.find({widgetOwnerId: widgeotto.widgetOwnerId});
 
         //console.warn(results);
 
         assert.equal(results.length, 1);
+        assert.equal(results[0].widgetName, "testWidget");
         assert.equal(results[0].id, widgeotto.id);
         assert.equal(results[0].widgetOwnerId, widgeotto.widgetOwnerId);
     });
@@ -124,6 +136,23 @@ describe("Widget tests", function() {
     });
 
     it("Create a new namespace with no widgets", async function () {
+        // TODO: we need to test _every feature_ with namespaces
+        let garyTable = new WidgetTable({tance});
+
+        let gary1 = await garyTable.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        let gary2 = await garyTable.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
         let table = new WidgetTable({tance, namespace:"empty"});
 
         // no garys in here!
@@ -137,7 +166,7 @@ describe("Widget tests", function() {
     });
 
     it("Try to create an invalid object and it'll throw a DocumentValidationError", async function () {
-        let table = new WidgetTable({tance, namespace:"empty"});
+        let table = new WidgetTable({tance});
 
         try{
             await table.insert({
@@ -163,5 +192,55 @@ describe("Widget tests", function() {
             assert.equal(err.constructor.name, "DocumentValidationError");
         }
     });
+
+    it("Find nobody, because everybody is named gary", async function () {
+        let table = new WidgetTable({tance});
+
+        let gary1 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+        let gary2 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        let results = await table.find({widgetName: "not gary"});
+
+        assert.equal(results.length, 0);
+    });
+
+    it("Find everybody", async function () {
+        let table = new WidgetTable({tance});
+
+        let gary1 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+        let gary2 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        let results = await table.find({});
+
+        assert.equal(results.length, 2);
+    });
+
+    // TODO: test modify
+    // TODO: test document validation upgrade
+    // TODO: test upgrade indexes
+
+    // TODO: a field that just holds an object or whatever
+    // TODO: integer indexes?
+    // TODO: sort?
 
 });
