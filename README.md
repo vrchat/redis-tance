@@ -56,12 +56,23 @@ async function doThings(){
 };
 ```
 
+Some redis commands call for a long list of arguments. If you
+have these as an array, you can provide them with the ***spread
+operator***.
+
+```
+async function getABunchOfIds(){
+    let ids = ["key1", "key2", "key3"];
+    return tance.mget(...ids);
+}
+```
+
 ### Cache
 
 Tance provides a cache wrapper that provides a sane-but-not-comprehensive
  default cache behavior for asynchronous functions.
  
-It might struggle if given a function with very complex inputs. 
+_It might struggle if given a function with very complex inputs._
 
 ```
     async function _rng(){
@@ -231,6 +242,15 @@ You can test that everything's working with a
 Or, if you need sudo to docker, 
 
     sudo jake redis.start
+
+
+### Running Tests
+
+In order for the tests to work, Redis must be running, locally (see above).
+
+```
+mocha test
+```
 
 ### Holy Debug Output Batman
 
