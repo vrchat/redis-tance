@@ -7,8 +7,6 @@ const Table = require('../lib/Table');
 const SimpleSetIndex = require('../lib/Indexes/SimpleSetIndex');
 const Skeema = require('../lib/Tance').Skeema;
 
-const SkeemaError = require('../lib/Errors').SkeemaError;
-
 const assert = require('chai').assert;
 
 class WidgetTable extends Table{
