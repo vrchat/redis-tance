@@ -22,6 +22,8 @@ class WidgetTable extends Table{
                 // these are our real properties:
                 "widgetOwnerId": {"type": "string"},
                 "widgetName": {"type": "string"},
+                // note that widgetOptional isn't in "required"
+                "widgetOptional": {"type": "string"},
                 "created_at_timestamp": {"type": "integer", "minimum": 0},
                 "created_at_iso": {"type": "string"},
             },
@@ -31,8 +33,13 @@ class WidgetTable extends Table{
 
         let schema = new Skeema({type: "Widget", v1: widgetSchemaV1});
         let widgetOwnerIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetOwnerId", sparse: false});
+        let widgetNameIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetName", sparse: false});
+        let widgetOptionalIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetOptional", sparse: true});
 
-        super({tance: tance, schema:schema, documentClass:LockingDocument, indexes: [widgetOwnerIndex]});
+        super({tance: tance,
+            schema:schema,
+            documentClass:LockingDocument,
+            indexes: [widgetOwnerIndex, widgetNameIndex, widgetOptionalIndex]});
     };
 }
 
@@ -42,8 +49,7 @@ describe("Widget tests", function() {
 
     before(async function () {
         const redisClient = redis.createClient();
-        let verbose = true;
-        tance = new Tance(redisClient, verbose);
+        tance = new Tance(redisClient);
 
         await tance.ready();
         await tance.flushall();
@@ -52,7 +58,7 @@ describe("Widget tests", function() {
 
     it("Create and retrieve a widget", async function () {
         let table = new WidgetTable(tance);
-        let object = await table.insert({
+        let widgeotto = await table.insert({
             "widgetOwnerId": "user-"+uuid(),
             "widgetName": "testWidget",
             "created_at_timestamp": luxon.local().valueOf(),
@@ -60,16 +66,16 @@ describe("Widget tests", function() {
         });
 
         //console.warn("Created:");
-        //console.warn(object);
+        //console.warn(widgeotto);
 
-        assert.exists(object.id);
-        assert.equal(object.type, "Widget");
-        assert.equal(object.version, 1);
-        assert.exists(object.widgetOwnerId);
-        assert.exists(object.created_at_timestamp);
-        assert.exists(object.created_at_iso);
+        assert.exists(widgeotto.id);
+        assert.equal(widgeotto.type, "Widget");
+        assert.equal(widgeotto.version, 1);
+        assert.exists(widgeotto.widgetOwnerId);
+        assert.exists(widgeotto.created_at_timestamp);
+        assert.exists(widgeotto.created_at_iso);
 
-        let widgey = await table.get(object.id);
+        let widgey = await table.get(widgeotto.id);
 
         //console.warn("Retrieved:");
         //console.warn(widgey);
@@ -82,4 +88,56 @@ describe("Widget tests", function() {
         assert.exists(widgey.created_at_iso);
 
     });
+
+    it("Find a widget", async function () {
+        let table = new WidgetTable(tance);
+        let widgeotto = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "testWidget",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        let results = await table.find({widgetOwnerId: widgeotto.widgetOwnerId});
+
+        //console.warn(results);
+
+        assert.equal(results.length, 1);
+        assert.equal(results[0].id, widgeotto.id);
+        assert.equal(results[0].widgetOwnerId, widgeotto.widgetOwnerId);
+    });
+
+    it("Find multiple widgets", async function () {
+        let table = new WidgetTable(tance);
+
+        let gary1 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+        let gary2 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        let results = await table.find({widgetName: "gary"});
+
+        assert.equal(results.length, 2);
+        assert.equal(results[0].widgetName, "gary");
+        assert.equal(results[1].widgetName, "gary");
+    });
+
+    it("Create a new namespace with no widgets", async function () {
+        let table = new WidgetTable(tance);
+
+        let results = await table.find({widgetName: "gary"});
+
+        assert.equal(results.length, 2);
+        assert.equal(results[0].widgetName, "gary");
+        assert.equal(results[1].widgetName, "gary");
+    });
+
 });

@@ -231,3 +231,8 @@ You can test that everything's working with a
 Or, if you need sudo to docker, 
 
     sudo jake redis.start
+
+### Holy Debug Output Batman
+
+Set the environment variable `TANCE_VERBOSE=true` to spit out 
+every single Redis command run by Tance, no matter how inconsequential
