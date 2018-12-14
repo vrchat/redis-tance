@@ -40,7 +40,7 @@ describe("Locking document tests", function() {
 
         let employeeSchema = new Skeema({type: "Employee", v1: empl});
 
-        let document = tance.lockingDocument({schema: employeeSchema});
+        let document = tance.lockingDocument({skeema: employeeSchema});
 
         let employee = {
             "firstname": "No",
@@ -94,7 +94,7 @@ describe("Locking document tests", function() {
 
         let employeeSchema = new Skeema({type: "Employee", v1: empl});
 
-        let document = tance.lockingDocument({schema: employeeSchema});
+        let document = tance.lockingDocument({skeema: employeeSchema});
 
         let employee = {
             "firstname": "No",

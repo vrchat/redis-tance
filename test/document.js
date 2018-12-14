@@ -32,7 +32,7 @@ describe("Document tests", function() {
 
         let employeeSchema = new Skeema({type: "Employee", v1: empl});
 
-        let document = tance.document({schema: employeeSchema});
+        let document = tance.document({skeema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -63,7 +63,7 @@ describe("Document tests", function() {
 
         let employeeSchema = new Skeema({type: "Employee", v1: empl});
 
-        let document = tance.document({schema: employeeSchema});
+        let document = tance.document({skeema: employeeSchema});
 
         let employee = {
             "data": "wrong"
@@ -94,7 +94,7 @@ describe("Document tests", function() {
 
         let employeeSchema = new Skeema({type: "Employee", v1: empl});
 
-        let document = tance.document({schema: employeeSchema});
+        let document = tance.document({skeema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -124,7 +124,7 @@ describe("Document tests", function() {
             return employee;
         });
 
-        let newDocument = tance.document({schema: newEmployeeSchema, id: id});
+        let newDocument = tance.document({skeema: newEmployeeSchema, id: id});
         let getEmployee = await newDocument.get();
 
         // when we get the OLD document, it should, as if by magic, conform to the new schema
@@ -147,7 +147,7 @@ describe("Document tests", function() {
 
         let employeeSchema = new Skeema({type: "Employee", v1: empl});
 
-        let document = tance.document({schema: employeeSchema});
+        let document = tance.document({skeema: employeeSchema});
 
         let employee = {
             "firstname": "Ilene",
@@ -184,7 +184,7 @@ describe("Document tests", function() {
 
         let employeeSchema = new Skeema({type: "Employee", v1: empl});
 
-        let document = tance.document({schema: employeeSchema});
+        let document = tance.document({skeema: employeeSchema});
 
         let employee = {
             "firstname": "Ilene",
