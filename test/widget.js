@@ -11,7 +11,7 @@ const Skeema = require('../lib/Tance').Skeema;
 const assert = require('chai').assert;
 
 class WidgetTable extends Table{
-    constructor(tance){
+    constructor({tance, namespace=""}){
         let widgetSchemaV1 = {
             "type": "object",
             "properties": {
@@ -20,7 +20,7 @@ class WidgetTable extends Table{
                 "type": {"type": "string"},
                 "version": {"type": "integer"},
                 // these are our real properties:
-                "widgetOwnerId": {"type": "string"},
+                "widgetOwnerId": {"type": "string", "index": "simple"},
                 "widgetName": {"type": "string"},
                 // note that widgetOptional isn't in "required"
                 "widgetOptional": {"type": "string"},
@@ -32,13 +32,13 @@ class WidgetTable extends Table{
         };
 
         let schema = new Skeema({type: "Widget", v1: widgetSchemaV1});
-        let widgetOwnerIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetOwnerId", sparse: false});
-        let widgetNameIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetName", sparse: false});
-        let widgetOptionalIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetOptional", sparse: true});
+        let widgetOwnerIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetOwnerId", sparse: false, namespace});
+        let widgetNameIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetName", sparse: false, namespace});
+        let widgetOptionalIndex = new SimpleSetIndex({tance: tance, type: "Widget", indexedProperty: "widgetOptional", sparse: true, namespace});
 
         super({tance: tance,
             schema:schema,
-            documentClass:LockingDocument,
+            namespace:namespace,
             indexes: [widgetOwnerIndex, widgetNameIndex, widgetOptionalIndex]});
     };
 }
@@ -57,7 +57,7 @@ describe("Widget tests", function() {
     });
 
     it("Create and retrieve a widget", async function () {
-        let table = new WidgetTable(tance);
+        let table = new WidgetTable({tance});
         let widgeotto = await table.insert({
             "widgetOwnerId": "user-"+uuid(),
             "widgetName": "testWidget",
@@ -90,7 +90,7 @@ describe("Widget tests", function() {
     });
 
     it("Find a widget", async function () {
-        let table = new WidgetTable(tance);
+        let table = new WidgetTable({tance});
         let widgeotto = await table.insert({
             "widgetOwnerId": "user-"+uuid(),
             "widgetName": "testWidget",
@@ -108,7 +108,7 @@ describe("Widget tests", function() {
     });
 
     it("Find multiple widgets", async function () {
-        let table = new WidgetTable(tance);
+        let table = new WidgetTable({tance});
 
         let gary1 = await table.insert({
             "widgetOwnerId": "user-"+uuid(),
@@ -131,13 +131,12 @@ describe("Widget tests", function() {
     });
 
     it("Create a new namespace with no widgets", async function () {
-        let table = new WidgetTable(tance);
+        let table = new WidgetTable({tance, namespace:"secret_tunnel"});
 
+        // no garys in here!
         let results = await table.find({widgetName: "gary"});
 
-        assert.equal(results.length, 2);
-        assert.equal(results[0].widgetName, "gary");
-        assert.equal(results[1].widgetName, "gary");
+        assert.equal(results.length, 0);
     });
 
 });
