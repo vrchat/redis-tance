@@ -7,6 +7,8 @@ const Table = require('../lib/Table');
 const SimpleSetIndex = require('../lib/Indexes/SimpleSetIndex');
 const Skeema = require('../lib/Tance').Skeema;
 
+const SkeemaError = require('../lib/Errors').SkeemaError;
+
 const assert = require('chai').assert;
 
 class WidgetTable extends Table{
@@ -134,6 +136,34 @@ describe("Widget tests", function() {
         let count = await table.count();
 
         assert.equal(count, 0);
+    });
+
+    it("Try to create an invalid object and it'll throw a DocumentValidationError", async function () {
+        let table = new WidgetTable({tance, namespace:"empty"});
+
+        try{
+            await table.insert({
+                "widgetOwnerId": "user-"+uuid(),
+                "widgetName": "gary",
+                "created_at_timestamp": -500,
+                "created_at_iso": luxon.local().toString(),
+            });
+
+            assert.isTrue(false);
+        } catch (err){
+            assert.equal(err.constructor.name, "DocumentValidationError");
+        }
+
+        try{
+            await table.insert({
+                "widgetName": "gary",
+                "created_at_iso": luxon.local().toString(),
+            });
+
+            assert.isTrue(false);
+        } catch (err){
+            assert.equal(err.constructor.name, "DocumentValidationError");
+        }
     });
 
 });
