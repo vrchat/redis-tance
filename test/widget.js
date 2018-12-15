@@ -425,11 +425,9 @@ describe("Widget tests", function() {
         assert.deepEqual(widgey.whatever, {});
     });
 
-    // TODO: test document validation upgrade
-    // TODO: upgrade indexes on document upgrade
+    // TODO: clear index
+    // TODO: clear table
     // TODO: recalculate indexes
-
-    // TODO: a field that just holds an object or whatever
     // TODO: integer indexes?
     // TODO: sort?
 
