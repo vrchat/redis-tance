@@ -425,8 +425,29 @@ describe("Widget tests", function() {
         assert.deepEqual(widgey.whatever, {});
     });
 
-    // TODO: clear index
-    // TODO: clear table
+    it("Clear everybody in a table. Nobody in the table.", async function () {
+        let table = new WidgetTable({tance});
+
+        let gary1 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+        let gary2 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        await table.clear();
+
+        let results = await table.find({});
+
+        assert.equal(results.length, 0);
+    });
+
     // TODO: recalculate indexes
     // TODO: integer indexes?
     // TODO: sort?
