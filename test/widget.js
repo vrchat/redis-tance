@@ -448,6 +448,29 @@ describe("Widget tests", function() {
         assert.equal(results.length, 0);
     });
 
+    it("Recalculate indexes, they should still work.", async function () {
+        let table = new WidgetTable({tance});
+
+        let gary1 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+        let gary2 = await table.insert({
+            "widgetOwnerId": "user-"+uuid(),
+            "widgetName": "gary",
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        await table.recalculateIndexes();
+
+        let results = await table.find({widgetName: "gary"});
+
+        assert.equal(results.length, 2);
+    });
+
     // TODO: recalculate indexes
     // TODO: integer indexes?
     // TODO: sort?
