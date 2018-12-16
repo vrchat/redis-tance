@@ -1,6 +1,6 @@
 const redis = require('redis');
 const Tance = require('../lib/Tance').Tance;
-const Skeema = require('../lib/Tance').Skeema;
+const MigratingSchema = require('../lib/Tance').MigratingSchema;
 const assert = require('chai').assert;
 
 let tance = null;
@@ -30,9 +30,9 @@ describe("Document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-        let document = tance.document({skeema: employeeSchema});
+        let document = tance.document({schema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -61,9 +61,9 @@ describe("Document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-        let document = tance.document({skeema: employeeSchema});
+        let document = tance.document({schema: employeeSchema});
 
         let employee = {
             "data": "wrong"
@@ -92,9 +92,9 @@ describe("Document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-        let document = tance.document({skeema: employeeSchema});
+        let document = tance.document({schema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -118,13 +118,13 @@ describe("Document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname", "fullname"]
         };
 
-        let newEmployeeSchema = new Skeema({type: "Employee", v1: empl});
+        let newEmployeeSchema = new MigratingSchema({type: "Employee", v1: empl});
         newEmployeeSchema.addVersion(empl2, employee => {
             employee.fullname = `${employee.firstname} ${employee.lastname}`;
             return employee;
         });
 
-        let newDocument = tance.document({skeema: newEmployeeSchema, id: id});
+        let newDocument = tance.document({schema: newEmployeeSchema, id: id});
         let getEmployee = await newDocument.get();
 
         // when we get the OLD document, it should, as if by magic, conform to the new schema
@@ -145,9 +145,9 @@ describe("Document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-        let document = tance.document({skeema: employeeSchema});
+        let document = tance.document({schema: employeeSchema});
 
         let employee = {
             "firstname": "Ilene",
@@ -182,9 +182,9 @@ describe("Document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-        let document = tance.document({skeema: employeeSchema});
+        let document = tance.document({schema: employeeSchema});
 
         let employee = {
             "firstname": "Ilene",

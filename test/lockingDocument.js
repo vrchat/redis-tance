@@ -1,6 +1,6 @@
 const redis = require('redis');
 const Tance = require('../lib/Tance').Tance;
-const Skeema = require('../lib/Tance').Skeema;
+const MigratingSchema = require('../lib/Tance').MigratingSchema;
 const assert = require('chai').assert;
 
 let tance = null;
@@ -38,9 +38,9 @@ describe("Locking document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-        let document = tance.lockingDocument({skeema: employeeSchema});
+        let document = tance.lockingDocument({schema: employeeSchema});
 
         let employee = {
             "firstname": "No",
@@ -92,9 +92,9 @@ describe("Locking document tests", function() {
             "required": ["id", "type", "version", "firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: empl});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-        let document = tance.lockingDocument({skeema: employeeSchema});
+        let document = tance.lockingDocument({schema: employeeSchema});
 
         let employee = {
             "firstname": "No",

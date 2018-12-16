@@ -5,7 +5,7 @@ const luxon = require('luxon').DateTime;
 
 const Table = require('../lib/Table');
 const SimpleSetIndex = require('../lib/Indexes/SimpleSetIndex');
-const Skeema = require('../lib/Tance').Skeema;
+const MigratingSchema = require('../lib/Tance').MigratingSchema;
 
 const assert = require('chai').assert;
 
@@ -30,9 +30,9 @@ class WidgetTable extends Table{
             "required": ["id", "type", "version", "widgetOwnerId", "widgetName", "created_at_timestamp", "created_at_iso"]
         };
 
-        let skeema = new Skeema({type: "Widget", v1: widgetSchemaV1});
+        let schema = new MigratingSchema({type: "Widget", v1: widgetSchemaV1});
 
-        super({tance, skeema, namespace});
+        super({tance, schema, namespace});
     };
 }
 
@@ -135,11 +135,11 @@ class WidgetTableV3 extends Table{
             return object;
         };
 
-        let skeema = new Skeema({type: "Widget", v1: widgetSchemaV1});
-        skeema.addVersion(widgetSchemaV2, v1ToV2);
-        skeema.addVersion(widgetSchemaV3, v2ToV3);
+        let schema = new MigratingSchema({type: "Widget", v1: widgetSchemaV1});
+        schema.addVersion(widgetSchemaV2, v1ToV2);
+        schema.addVersion(widgetSchemaV3, v2ToV3);
 
-        super({tance, skeema, namespace});
+        super({tance, schema, namespace});
     };
 }
 

@@ -1,6 +1,6 @@
 const redis = require('redis');
 const Tance = require('../lib/Tance').Tance;
-const Skeema = require('../lib/Tance').Skeema;
+const MigratingSchema = require('../lib/Tance').MigratingSchema;
 const assert = require('chai').assert;
 const uuid = require('uuid/v4');
 
@@ -30,7 +30,7 @@ describe("Schema tests", function() {
             "required": ["firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: employeeV1});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: employeeV1});
 
         let validEmployee = {
             "version": 1,
@@ -54,7 +54,7 @@ describe("Schema tests", function() {
             "required": ["firstname", "lastname"]
         };
 
-        let employeeSchema = new Skeema({type: "Employee", v1: employeeV1});
+        let employeeSchema = new MigratingSchema({type: "Employee", v1: employeeV1});
 
         let invalidEmployee = {
             "version": 1,
@@ -104,7 +104,7 @@ describe("Schema tests", function() {
             "required": ["firstname", "lastname", "fullname"]
         }
 
-        let employeeSchema = new Skeema({type: "Employee"});
+        let employeeSchema = new MigratingSchema({type: "Employee"});
 
         employeeSchema.addVersion(employeeV1, x => x);
         employeeSchema.addVersion(employeeV2, v1_employee => {
@@ -132,7 +132,7 @@ describe("Schema tests", function() {
         assert.equal(upgradedEmployee.fullname, "Charles Huckbreimer");
     });
 
-    it("Serializing skeema", async function() {
+    it("Serializing schema", async function() {
         let employeeV1 = {
             "type": "object",
             "properties": {
@@ -172,7 +172,7 @@ describe("Schema tests", function() {
             "required": ["firstname", "lastname", "fullname"]
         }
 
-        let employeeSchema = new Skeema({type: "Employee"});
+        let employeeSchema = new MigratingSchema({type: "Employee"});
 
         employeeSchema.addVersion(employeeV1, x => x);
         employeeSchema.addVersion(employeeV2, v1_employee => {
@@ -188,7 +188,7 @@ describe("Schema tests", function() {
 
         let serialized = employeeSchema.serialize();
 
-        let dehydratedSkeem = Skeema.deserialize(serialized);
+        let dehydratedSkeem = MigratingSchema.deserialize(serialized);
 
         let validEmployee = {
             "version": 1,
