@@ -2,6 +2,7 @@ const redis = require('redis');
 const Tance = require('../lib/Tance').Tance;
 const MigratingSchema = require('../lib/Tance').MigratingSchema;
 const assert = require('chai').assert;
+const Schema = require('../lib/Schema/Schema');
 
 let tance = null;
 
@@ -98,6 +99,20 @@ describe("Redis Set tests", function() {
         let hurg = await set.get();
 
         assert.deepEqual(hurg, []);
+    });
+
+    it("Get random members of the set", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let response = await set.randmember(3);
+
+        assert.equal(response.length, 3);
     });
 
 });
