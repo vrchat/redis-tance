@@ -5,6 +5,21 @@ const assert = require('chai').assert;
 
 let tance = null;
 
+let empl = {
+    "type": "object",
+    "properties": {
+        "id": {"type": "string"},
+        "type": {"type": "string"},
+        "version": {"type": "integer"},
+        "firstname": {"type": "string"},
+        "lastname": {"type": "string"},
+    },
+    "additionalProperties": false,
+    "required": ["id", "type", "version", "firstname", "lastname"]
+};
+
+let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
+
 describe("Redis Set tests", function() {
 
     before(async function () {
@@ -17,21 +32,6 @@ describe("Redis Set tests", function() {
     });
 
     it("Get and set an employee", async function() {
-        let empl = {
-            "type": "object",
-            "properties": {
-                "id": {"type": "string"},
-                "type": {"type": "string"},
-                "version": {"type": "integer"},
-                "firstname": {"type": "string"},
-                "lastname": {"type": "string"},
-            },
-            "additionalProperties": false,
-            "required": ["id", "type", "version", "firstname", "lastname"]
-        };
-
-        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
-
         let set = tance.redisSet({schema: employeeSchema});
 
         let employee = {
@@ -48,22 +48,7 @@ describe("Redis Set tests", function() {
         assert.equal(getEmployee[0].firstname, "Dang");
     });
 
-    it("Invalid employee throws an error", async function() {
-        let empl = {
-            "type": "object",
-            "properties": {
-                "id": {"type": "string"},
-                "type": {"type": "string"},
-                "version": {"type": "integer"},
-                "firstname": {"type": "string"},
-                "lastname": {"type": "string"},
-            },
-            "additionalProperties": false,
-            "required": ["id", "type", "version", "firstname", "lastname"]
-        };
-
-        let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
-
+    it("Invalid set employee throws an error", async function() {
         let set = tance.redisSet({schema: employeeSchema});
 
         let employee = {
@@ -79,5 +64,23 @@ describe("Redis Set tests", function() {
         }
     });
 
+    it("Modify a set employee", async function() {
+        let set = tance.redisSet({schema: employeeSchema});
+
+        let employee = {
+            "firstname": "Dang",
+            "lastname": "Son",
+        };
+
+        let setEmployee = await set.set(employee);
+
+        await set.modify((x) => {
+            return new Set([...x].map(x => {x.firstname="Hang"; return x;}))
+        });
+
+        let getEmployee = await set.get();
+
+        assert.equal(getEmployee[0].firstname, "Hang");
+    });
 
 });
