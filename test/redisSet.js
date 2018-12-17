@@ -115,4 +115,20 @@ describe("Redis Set tests", function() {
         assert.equal(response.length, 3);
     });
 
+    it("Check if set has something", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let response = await set.has(3);
+        let otherResponse = await set.has(9);
+
+        assert.equal(response, true);
+        assert.equal(otherResponse, false);
+    });
+
 });
