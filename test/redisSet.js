@@ -131,4 +131,18 @@ describe("Redis Set tests", function() {
         assert.equal(otherResponse, false);
     });
 
+    it("Count members of the set", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let count = await set.count();
+
+        assert.equal(count, 5);
+    });
+
 });
