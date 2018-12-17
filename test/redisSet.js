@@ -72,7 +72,7 @@ describe("Redis Set tests", function() {
             "lastname": "Son",
         };
 
-        let setEmployee = await set.set(employee);
+        await set.set(employee);
 
         await set.modify((x) => {
             return new Set([...x].map(x => {x.firstname="Hang"; return x;}))
@@ -81,6 +81,23 @@ describe("Redis Set tests", function() {
         let getEmployee = await set.get();
 
         assert.equal(getEmployee[0].firstname, "Hang");
+    });
+
+    it("Delete an employee", async function() {
+        let set = tance.redisSet({schema: employeeSchema});
+
+        let employee = {
+            "firstname": "Dang",
+            "lastname": "Son",
+        };
+
+        await set.set(employee);
+
+        await set.delete();
+
+        let hurg = await set.get();
+
+        assert.deepEqual(hurg, []);
     });
 
 });
