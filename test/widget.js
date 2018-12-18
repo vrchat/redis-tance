@@ -471,7 +471,6 @@ describe("Widget tests", function() {
         assert.equal(results.length, 2);
     });
 
-    // TODO: recalculate indexes
     // TODO: integer indexes?
     // TODO: sort?
 
