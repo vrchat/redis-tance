@@ -76,8 +76,6 @@ describe("Expiring Widget Tests", function() {
 
         let widgey = await table.get(widgeotto.id);
 
-        console.warn(widgey);
-
         assert.isNull(widgey);
     });
 });
