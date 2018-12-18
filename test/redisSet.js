@@ -145,4 +145,140 @@ describe("Redis Set tests", function() {
         assert.equal(count, 5);
     });
 
+    it("Intersect", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+
+        await set2.set(3);
+        await set2.set(4);
+        await set2.set(5);
+        await set2.set(6);
+        await set2.set(7);
+
+        let intersection = await set.intersect(set2);
+
+        assert.deepEqual(intersection, ["3","4","5"]);
+    });
+
+    it("IntersectStore", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+
+        await set2.set(3);
+        await set2.set(4);
+        await set2.set(5);
+        await set2.set(6);
+        await set2.set(7);
+
+        let intersectionObj = await set.intersectStore(set2);
+
+        assert.deepEqual(await intersectionObj.members(), ["3","4","5"]);
+    });
+
+    it("Union", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+
+        await set2.set(3);
+        await set2.set(4);
+        await set2.set(5);
+        await set2.set(6);
+        await set2.set(7);
+
+        let oneToSeven = await set.union(set2);
+
+        assert.deepEqual(oneToSeven, ["1","2","3","4","5","6","7"]);
+    });
+
+    it("UnionStore", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+
+        await set2.set(3);
+        await set2.set(4);
+        await set2.set(5);
+        await set2.set(6);
+        await set2.set(7);
+
+        let unionObj = await set.unionStore(set2);
+
+        assert.deepEqual(await unionObj.members(), ["1","2","3","4","5","6","7"]);
+    });
+
+    it("Diff", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+
+        await set2.set(3);
+        await set2.set(4);
+        await set2.set(5);
+        await set2.set(6);
+        await set2.set(7);
+
+        let differenceLeft = await set.diff(set2);
+        let differenceRight = await set2.diff(set);
+
+        assert.deepEqual(differenceLeft, ["1","2"]);
+        assert.deepEqual(differenceRight, ["6","7"]);
+    });
+
+    it("DiffStore", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+
+        await set2.set(3);
+        await set2.set(4);
+        await set2.set(5);
+        await set2.set(6);
+        await set2.set(7);
+
+        let differenceLeft = await set.diffStore(set2);
+        let differenceRight = await set2.diffStore(set);
+
+        assert.deepEqual(await differenceLeft.members(), ["1","2"]);
+        assert.deepEqual(await differenceRight.members(), ["6","7"]);
+    });
+
 });
