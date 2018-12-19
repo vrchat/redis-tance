@@ -36,7 +36,7 @@ class WidgetTable extends Table{
 
 let tance = null;
 
-describe("Widget tests", function() {
+describe("Integer Widget tests", function() {
 
     before(async function () {
         const redisClient = redis.createClient();
@@ -52,7 +52,7 @@ describe("Widget tests", function() {
         return;
     });
 
-    it("Create and retrieve a widget", async function () {
+    it("Create and retrieve an integer widget", async function () {
         let table = new WidgetTable({tance});
         await table.insert({
             "widgetName": "three",
@@ -84,18 +84,20 @@ describe("Widget tests", function() {
 
         let fiveAndSix = await table.find({widgetNumber: {"$gte": 5}});
         let justSix = await table.find({widgetNumber: {"$gt": 5}});
-        let fourAndFive = await table.find({widgetNumber: {"$lte": 5}});
-        let justFour = await table.find({widgetNumber: {"$lt": 5}});
-        let justFive = await table.find({widgetNumber: {"$gt": 4, "$lt": 5}});
+        let threeFourFive = await table.find({widgetNumber: {"$lte": 5}});
+        let threeFour = await table.find({widgetNumber: {"$lt": 5}});
+        let justFive = await table.find({widgetNumber: {"$gt": 4, "$lt": 6}});
+        let alsoJustFive = await table.find({widgetNumber: {"$gt": 4, "$lt": 6}, widgetName: "five"});
 
         //console.warn("Retrieved:");
         //console.warn(widgey);
 
-        assert.deepEqual(fiveAndSix.map(x => x.widgetNumber), ["5", "6"]);
-        assert.deepEqual(justSix.map(x => x.widgetNumber), ["6"]);
-        assert.deepEqual(fourAndFive.map(x => x.widgetNumber), ["4", "5"]);
-        assert.deepEqual(justFour.map(x => x.widgetNumber), ["4"]);
-        assert.deepEqual(justFive.map(x => x.widgetNumber), ["5"]);
+        assert.deepEqual(fiveAndSix.map(x => x.widgetNumber).sort(), [5, 6]);
+        assert.deepEqual(justSix.map(x => x.widgetNumber).sort(), [6]);
+        assert.deepEqual(threeFourFive.map(x => x.widgetNumber).sort(), [3, 4, 5]);
+        assert.deepEqual(threeFour.map(x => x.widgetNumber).sort(), [3, 4]);
+        assert.deepEqual(justFive.map(x => x.widgetNumber).sort(), [5]);
+        assert.deepEqual(alsoJustFive.map(x => x.widgetNumber).sort(), [5]);
     });
 
 });
