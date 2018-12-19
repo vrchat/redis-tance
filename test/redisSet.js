@@ -131,6 +131,20 @@ describe("Redis Set tests", function() {
         assert.equal(otherResponse, false);
     });
 
+    it("Get a number out of the set", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let members = await set.members();
+
+        assert.deepEqual(members.sort(), [1,2,3,4,5] );
+    });
+
     it("Count members of the set", async function() {
         let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
 
@@ -164,7 +178,7 @@ describe("Redis Set tests", function() {
 
         let intersection = await set.intersect(set2);
 
-        assert.deepEqual(intersection, ["3","4","5"]);
+        assert.deepEqual(intersection, [3,4,5]);
     });
 
     it("IntersectStore", async function() {
@@ -186,7 +200,7 @@ describe("Redis Set tests", function() {
 
         let intersectionObj = await set.intersectStore(set2);
 
-        assert.deepEqual(await intersectionObj.members(), ["3","4","5"]);
+        assert.deepEqual(await intersectionObj.members(), [3,4,5]);
     });
 
     it("Union", async function() {
@@ -208,7 +222,7 @@ describe("Redis Set tests", function() {
 
         let oneToSeven = await set.union(set2);
 
-        assert.deepEqual(oneToSeven, ["1","2","3","4","5","6","7"]);
+        assert.deepEqual(oneToSeven, [1,2,3,4,5,6,7]);
     });
 
     it("UnionStore", async function() {
@@ -230,7 +244,7 @@ describe("Redis Set tests", function() {
 
         let unionObj = await set.unionStore(set2);
 
-        assert.deepEqual(await unionObj.members(), ["1","2","3","4","5","6","7"]);
+        assert.deepEqual(await unionObj.members(), [1,2,3,4,5,6,7]);
     });
 
     it("Diff", async function() {
@@ -253,8 +267,8 @@ describe("Redis Set tests", function() {
         let differenceLeft = await set.diff(set2);
         let differenceRight = await set2.diff(set);
 
-        assert.deepEqual(differenceLeft, ["1","2"]);
-        assert.deepEqual(differenceRight, ["6","7"]);
+        assert.deepEqual(differenceLeft, [1,2]);
+        assert.deepEqual(differenceRight, [6,7]);
     });
 
     it("DiffStore", async function() {
@@ -277,8 +291,8 @@ describe("Redis Set tests", function() {
         let differenceLeft = await set.diffStore(set2);
         let differenceRight = await set2.diffStore(set);
 
-        assert.deepEqual(await differenceLeft.members(), ["1","2"]);
-        assert.deepEqual(await differenceRight.members(), ["6","7"]);
+        assert.deepEqual(await differenceLeft.members(), [1, 2]);
+        assert.deepEqual(await differenceRight.members(), [6, 7]);
     });
 
 });
