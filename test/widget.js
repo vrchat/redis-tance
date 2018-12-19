@@ -50,7 +50,7 @@ class WidgetTableV3 extends Table{
                 "widgetName": {"type": "string", "index": "simple"},
                 // note that widgetOptional isn't in "required"
                 "widgetOptional": {"type": "string", "index": "simple"},
-                "created_at_timestamp": {"type": "integer", "minimum": 0},
+                "created_at_timestamp": {"type": "integer", "minimum": 0, "index": "integer"},
                 "created_at_iso": {"type": "string"},
             },
             "additionalProperties": false,
