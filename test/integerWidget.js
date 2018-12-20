@@ -100,4 +100,47 @@ describe("Integer Widget tests", function() {
         assert.deepEqual(alsoJustFive.map(x => x.widgetNumber).sort(), [5]);
     });
 
+    it("Top, bottom, n, and offset", async function () {
+        let table = new WidgetTable({tance});
+        await table.insert({
+            "widgetName": "three",
+            "widgetNumber": 3,
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        await table.insert({
+            "widgetName": "four",
+            "widgetNumber": 4,
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        await table.insert({
+            "widgetName": "five",
+            "widgetNumber": 5,
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        await table.insert({
+            "widgetName": "six",
+            "widgetNumber": 6,
+            "created_at_timestamp": luxon.local().valueOf(),
+            "created_at_iso": luxon.local().toString(),
+        });
+
+        let fiveAndSix = await table.find({widgetNumber: {"$top": 2}});
+        let threeAndFour = await table.find({widgetNumber: {"$bottom": 2}});
+        let justFour = await table.find({widgetNumber: {"$gt": 0, "$n": 1, "$offset": 1}});
+        let justThree = await table.find({widgetNumber: {"$bottom": 2, "$n": 1}});
+
+        //console.warn("Retrieved:");
+        //console.warn(widgey);
+
+        assert.deepEqual(fiveAndSix.map(x => x.widgetNumber).sort(), [5, 6]);
+        assert.deepEqual(threeAndFour.map(x => x.widgetNumber).sort(), [3, 4]);
+        assert.deepEqual(justThree.map(x => x.widgetNumber).sort(), [3]);
+        assert.deepEqual(justFour.map(x => x.widgetNumber).sort(), [4]);
+    });
 });
