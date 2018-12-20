@@ -94,6 +94,23 @@ describe("Redis Set tests", function() {
 
         await set.set(employee);
 
+        await set.rem(employee);
+
+        let hurg = await set.get();
+
+        assert.deepEqual(hurg, []);
+    });
+
+    it("Clear the whole set", async function() {
+        let set = tance.redisSet({schema: employeeSchema});
+
+        let employee = {
+            "firstname": "Dang",
+            "lastname": "Son",
+        };
+
+        await set.set(employee);
+
         await set.delete();
 
         let hurg = await set.get();
