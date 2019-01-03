@@ -185,4 +185,19 @@ describe("Cache tests", function() {
 
     });
 
+    it("Cache should be able to ignore arguments", async function() {
+
+        async function _rng1({x}){
+            return uuid();
+        }
+
+        let rng = tance.cacheFn({fn: _rng1, durationInSeconds: 100, ignoreArgs: ['x']});
+
+        let rng1 = await rng({x:1});
+        let rng2 = await rng({x:4});
+
+        // despite having different x values, these two should cache the same way
+        assert.equal(rng1, rng2);
+    });
+
 });
