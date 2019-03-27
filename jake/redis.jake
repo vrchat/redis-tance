@@ -3,7 +3,7 @@ const docker = require('./docker.jake');
 const REDIS_PORT = 6379;
 const redis_docker_name = "test-redis";
 
-const CLUSTER_PORTS = [6379, 6380, 6381, 6382, 6383, 6384];
+const CLUSTER_PORTS = [6380, 6381, 6382, 6383, 6384, 6385];
 const REDIS_CLUSTER_NETWORK_NAME = "redis_cluster_net";
 
 /*
@@ -57,21 +57,20 @@ async function startCluster(){
         let ip = await docker.getIp({network: REDIS_CLUSTER_NETWORK_NAME, name: `${redis_docker_name}-${cluster_port}`});
         ip = ip.trim();
         let cluster_host = `${ip}:${cluster_port}`;
-        console.warn(`CLUSTER HOST: ${ip}`);
+        console.warn(`CLUSTER HOST: ${cluster_host}`);
 
         return cluster_host;
     });
 
     let hosts = await Promise.all(additionalPromises);
 
-    docker.run({
+    // docker run -i --rm --net $network_name $redis_image redis-cli --cluster create $cluster_hosts --cluster-replicas 1;
+    docker.start({
         name: `${redis_docker_name}-command`,
         network: REDIS_CLUSTER_NETWORK_NAME,
         container: 'redis',
-        command: ''
+        command: `redis-cli --cluster create ${hosts.join(" ")} --cluster-replicas 1`
     })
-
-
 }
 namespace('cluster', ()=>{
     desc("Start redis cluster");

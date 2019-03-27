@@ -4,8 +4,6 @@
  * Functionality having to do with running Docker locally.
  * Mostly helper functions.
  */
-const docker = require('docker-cli-js');
-
 const run = require('./run.jake').run;
 const irun = require('./run.jake').irun;
 
@@ -137,15 +135,19 @@ async function start ({name, network, container, environment, detached, ports, c
     }
 
     let environmentString = "";
-    Object.keys(environment).forEach((key)=>{
-        let value = environment[key];
-        environmentString = environmentString + `-e ${key}=${value} `;
-    });
+    if(environment != null){
+        Object.keys(environment).forEach((key)=>{
+            let value = environment[key];
+            environmentString = environmentString + `-e ${key}=${value} `;
+        });
+    }
 
     let portString = "";
-    ports.forEach((port)=>{
-        portString = portString + `-p ${port}:${port} `;
-    });
+    if(ports != null){
+        ports.forEach((port)=>{
+            portString = portString + `-p ${port}:${port} `;
+        });
+    }
 
     let networkString = "";
     if(network != null){
