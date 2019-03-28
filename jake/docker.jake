@@ -128,7 +128,7 @@ async function remove({name}){
  *             detached: true,
  *             ports: [1337])
  */
-async function start ({name, network, container, environment, detached, ports, complexArgs, command}) {
+async function start ({name, network, container, environment, detached, ports, complexArgs, command, yes}) {
     if(await isRunning({name: name})){
         console.log(`${name} is already running!`);
         return Promise.resolve();
@@ -155,9 +155,14 @@ async function start ({name, network, container, environment, detached, ports, c
     }
 
     if(detached) {
-        return run(`docker run -d --log-driver=json-file ${networkString} ${portString} ${environmentString} --name=${name} ${complexArgs || ""} ${container} ${command || ""}`);
+        let cmd = `docker run -d --log-driver=json-file ${networkString} ${portString} ${environmentString} --name=${name} ${complexArgs || ""} ${container} ${command || ""}`;
+        console.log(cmd);
+        return run(cmd);
     } else {
-        return irun(`docker run -i --rm ${networkString} ${portString} ${environmentString} --name=${name} ${complexArgs || ""} ${container} ${command || ""}`);
+        let cmd =`docker run -i --rm ${networkString} ${portString} ${environmentString} --name=${name} ${complexArgs || ""} ${container} ${command || ""}`;
+        console.log(cmd);
+
+        return irun(cmd);
     }
 }
 
