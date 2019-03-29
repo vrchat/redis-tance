@@ -7,8 +7,8 @@
     "jsonschema": "^1.2.4",
     "luxon": "^1.8.2",
     "murmurhash": "0.0.2",
-    "node-redis": "^0.1.7",
     "redis": "^2.8.0",
+    "redis-clustr": "^1.7.0",
     "redis-commands": "^1.4.0",
     "uuid": "^3.3.2"
   },
