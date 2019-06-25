@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git+https://github.com/vrchat/redis-tance.git"
   },
-  "author": "Curtis Lassam",
+  "author": "VRChat",
   "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/classam/redis-tance/issues"
