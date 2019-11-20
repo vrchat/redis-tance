@@ -1,6 +1,6 @@
 {
   "name": "redistance",
-  "version": "1.7.2",
+  "version": "1.7.5",
   "description": "a collection of useful redis utilities",
   "main": "index.js",
   "dependencies": {
@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git+https://github.com/vrchat/redis-tance.git"
   },
-  "author": "Curtis Lassam",
+  "author": "VRChat",
   "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/classam/redis-tance/issues"

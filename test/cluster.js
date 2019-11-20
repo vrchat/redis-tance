@@ -5,6 +5,7 @@ const uuid = require('uuid/v4');
 
 let tance = null;
 
+/*
 describe("Cluster tests", function() {
 
     before(async function(){
@@ -229,3 +230,4 @@ describe("Cluster tests", function() {
     });
 
 });
+ */

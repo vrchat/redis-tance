@@ -200,4 +200,17 @@ describe("Cache tests", function() {
         assert.equal(rng1, rng2);
     });
 
+    it("SLOAD should be able to load 5000 things", async function() {
+
+        let longset = [];
+        for(var i = 0; i < 4000; i++){
+            longset.push(i);
+        }
+        await tance.sload("long_set", ...longset);
+
+        let count = await tance.scard("long_set");
+
+        assert.equal(count, "4000");
+    });
+
 });
