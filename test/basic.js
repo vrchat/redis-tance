@@ -213,4 +213,20 @@ describe("Cache tests", function() {
         assert.equal(count, "4000");
     });
 
+    it("multi should provide promise-based access to the multi exec function", async function() {
+
+        await tance.set('hats', 'HEYO');
+
+        let three_heyos = await tance.multi()
+            .get("hats")
+            .get("hats")
+            .get("hats").exec();
+
+        assert.equal(three_heyos.length, 3);
+        assert.equal(three_heyos[0], "HEYO");
+        assert.equal(three_heyos[1], "HEYO");
+        assert.equal(three_heyos[2], "HEYO");
+    });
+
+
 });
