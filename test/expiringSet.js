@@ -21,7 +21,7 @@ let empl = {
 
 let employeeSchema = new MigratingSchema({type: "Employee", v1: empl});
 
-describe("Redis Set tests", function() {
+describe("Redis Expiring Set tests", function() {
 
     before(async function () {
         const redisClient = redis.createClient();
@@ -32,8 +32,8 @@ describe("Redis Set tests", function() {
         return;
     });
 
-    it("Get and set an employee", async function() {
-        let set = tance.redisSet({schema: employeeSchema});
+    it("Let an employee expire", async function() {
+        let set = tance.expiringSet({schema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -42,15 +42,29 @@ describe("Redis Set tests", function() {
 
         let setEmployee = await set.set(employee);
 
+        let results = await set.get();
+
+        //Dang should be in there
+        assert.equal(results.length, 1);
+
+        //Dang should STILL be in there
+        await set.expire();
+
         let getEmployee = await set.get();
 
         assert.deepEqual(setEmployee, getEmployee[0]);
 
         assert.equal(getEmployee[0].firstname, "Dang");
+
+        await set.expire();
+
+        let finalResults = await set.members();
+
+        assert.equal(finalResults.length, 0);
     });
 
     it("Invalid set employee throws an error", async function() {
-        let set = tance.redisSet({schema: employeeSchema});
+        let set = tance.expiringSet({schema: employeeSchema});
 
         let employee = {
             "data": "wrong"
@@ -65,21 +79,8 @@ describe("Redis Set tests", function() {
         }
     });
 
-    it("Created sets are unique", async function() {
-        let setA = tance.redisSet({schema: Schema.Integer()});
-        let setB = tance.redisSet({schema: Schema.Integer()});
-
-        await setA.set(1);
-        await setA.set(2);
-        await setA.set(3);
-
-        let getNums = await setB.get();
-
-        assert.equal(getNums.length, 0);
-    });
-
     it("Modify a set employee", async function() {
-        let set = tance.redisSet({schema: employeeSchema});
+        let set = tance.expiringSet({schema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -87,6 +88,8 @@ describe("Redis Set tests", function() {
         };
 
         await set.set(employee);
+
+        await set.expire();
 
         await set.modify((x) => {
             return new Set([...x].map(x => {x.firstname="Hang"; return x;}))
@@ -97,8 +100,21 @@ describe("Redis Set tests", function() {
         assert.equal(getEmployee[0].firstname, "Hang");
     });
 
+    it("Created sets are unique", async function() {
+        let setA = tance.expiringSet({schema: Schema.Integer()});
+        let setB = tance.expiringSet({schema: Schema.Integer()});
+
+        await setA.set(1);
+        await setA.set(2);
+        await setA.set(3);
+
+        let getNums = await setB.get();
+
+        assert.equal(getNums.length, 0);
+    });
+
     it("Delete an employee", async function() {
-        let set = tance.redisSet({schema: employeeSchema});
+        let set = tance.expiringSet({schema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -115,7 +131,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Clear the whole set", async function() {
-        let set = tance.redisSet({schema: employeeSchema});
+        let set = tance.expiringSet({schema: employeeSchema});
 
         let employee = {
             "firstname": "Dang",
@@ -132,7 +148,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Get random members of the set", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -146,7 +162,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Check if set has something", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -162,7 +178,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Get a number out of the set", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -176,7 +192,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Count members of the set", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -190,7 +206,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Intersect", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -198,7 +214,7 @@ describe("Redis Set tests", function() {
         await set.set(4);
         await set.set(5);
 
-        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+        let set2 = tance.expiringSet({id: "34567", schema: Schema.Integer()});
 
         await set2.set(3);
         await set2.set(4);
@@ -212,7 +228,7 @@ describe("Redis Set tests", function() {
     });
 
     it("IntersectStore", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -220,7 +236,7 @@ describe("Redis Set tests", function() {
         await set.set(4);
         await set.set(5);
 
-        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+        let set2 = tance.expiringSet({id: "34567", schema: Schema.Integer()});
 
         await set2.set(3);
         await set2.set(4);
@@ -234,7 +250,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Union", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -242,7 +258,7 @@ describe("Redis Set tests", function() {
         await set.set(4);
         await set.set(5);
 
-        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+        let set2 = tance.expiringSet({id: "34567", schema: Schema.Integer()});
 
         await set2.set(3);
         await set2.set(4);
@@ -256,7 +272,7 @@ describe("Redis Set tests", function() {
     });
 
     it("UnionStore", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -264,7 +280,7 @@ describe("Redis Set tests", function() {
         await set.set(4);
         await set.set(5);
 
-        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+        let set2 = tance.expiringSet({id: "34567", schema: Schema.Integer()});
 
         await set2.set(3);
         await set2.set(4);
@@ -278,7 +294,7 @@ describe("Redis Set tests", function() {
     });
 
     it("Diff", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -286,7 +302,7 @@ describe("Redis Set tests", function() {
         await set.set(4);
         await set.set(5);
 
-        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+        let set2 = tance.expiringSet({id: "34567", schema: Schema.Integer()});
 
         await set2.set(3);
         await set2.set(4);
@@ -302,7 +318,7 @@ describe("Redis Set tests", function() {
     });
 
     it("DiffStore", async function() {
-        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+        let set = tance.expiringSet({id: "12345", schema: Schema.Integer()});
 
         await set.set(1);
         await set.set(2);
@@ -310,7 +326,7 @@ describe("Redis Set tests", function() {
         await set.set(4);
         await set.set(5);
 
-        let set2 = tance.redisSet({id: "34567", schema: Schema.Integer()});
+        let set2 = tance.expiringSet({id: "34567", schema: Schema.Integer()});
 
         await set2.set(3);
         await set2.set(4);
