@@ -1,6 +1,6 @@
 {
   "name": "redistance",
-  "version": "1.7.6",
+  "version": "1.8.0",
   "description": "a collection of useful redis utilities",
   "main": "index.js",
   "dependencies": {
