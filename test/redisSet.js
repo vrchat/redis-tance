@@ -233,6 +233,22 @@ describe("Redis Set tests", function() {
         assert.deepEqual(await intersectionObj.members(), [3,4,5]);
     });
 
+    it("CopyTo", async function() {
+        let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let garglebarb = await set.copyTo("garglebarb");
+
+        let copiedObj = await garglebarb.members();
+
+        assert.deepEqual(copiedObj, [1,2,3,4,5]);
+    });
+
     it("Union", async function() {
         let set = tance.redisSet({id: "12345", schema: Schema.Integer()});
 
