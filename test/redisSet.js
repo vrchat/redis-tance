@@ -49,6 +49,28 @@ describe("Redis Set tests", function() {
         assert.equal(getEmployee[0].firstname, "Dang");
     });
 
+    it("Get and set a basic string", async function() {
+        let set = tance.redisSet({schema: Schema.String()});
+
+        await set.add("Hello!");
+
+        let getResult = await set.get();
+
+        assert.equal(getResult.length, 1);
+        assert.equal(getResult[0], "Hello!");
+    });
+
+    it("Get and set a basic integer", async function() {
+        let set = tance.redisSet({schema: Schema.Integer()});
+
+        await set.add(8);
+
+        let getResult = await set.get();
+
+        assert.equal(getResult.length, 1);
+        assert.equal(getResult[0], 8);
+    });
+
     it("Invalid set employee throws an error", async function() {
         let set = tance.redisSet({schema: employeeSchema});
 

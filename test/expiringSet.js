@@ -128,6 +128,12 @@ describe("Redis Expiring Set tests", function() {
         let hurg = await set.get();
 
         assert.deepEqual(hurg, []);
+
+        set.expire();
+
+        let stillRemoved = await set.get();
+
+        assert.deepEqual(stillRemoved, []);
     });
 
     it("Clear the whole set", async function() {
