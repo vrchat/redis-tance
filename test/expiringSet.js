@@ -347,4 +347,33 @@ describe("Redis Expiring Set tests", function() {
         assert.deepEqual(await differenceRight.members(), [6, 7]);
     });
 
+    it("We should be able to get a list of expired members", async function() {
+        let set = tance.expiringSet({id: "expiryboy", schema: Schema.Integer()});
+
+        await set.set(1);
+        await set.set(2);
+        await set.set(3);
+        await set.set(4);
+        await set.set(5);
+
+        let numbers = await set.members();
+        assert.deepEqual(numbers, [1,2,3,4,5]);
+
+        await set.expire();
+
+        await set.set(1);
+        await set.set(3);
+        await set.set(5);
+
+        let moreNumbers = await set.members();
+        assert.deepEqual(moreNumbers, [1,2,3,4,5]);
+
+        let toExpire = await set.listExpiredEntries();
+        assert.deepEqual(toExpire, [2,4]);
+
+        await set.expire();
+
+        let finalNumbers = await set.members();
+        assert.deepEqual(finalNumbers, [1,3,5]);
+    });
 });
